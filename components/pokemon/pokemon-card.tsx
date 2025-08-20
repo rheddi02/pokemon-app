@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import Image from "next/image";
 import { TypeBadge } from "@/components/pokemon/type-badge";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getPokemonDetail } from "@/utils/api";
 import { POKEMON_CONFIG } from "@/lib/constants";
 import { useInView } from "react-intersection-observer";
 import { useSearchParams } from "next/navigation";
+import { PokemonCardSkeleton } from "./pokemon-card-skeleton";
 
 interface PokemonCardProps {
   name: string;
@@ -27,7 +28,8 @@ export function PokemonCard({ name, url, types = [], stats = [], index = 0 }: Po
   const { isFavorite, toggleFavorite } = useFavorites();
   const fav = isFavorite(name);
   const searchParams = useSearchParams();
-  
+  const queryClient = useQueryClient();
+
   // Preserve current URL params when navigating to Pokemon detail
   const pokemonUrl = `/pokemon/${name}?${searchParams.toString()}`;
 
@@ -47,22 +49,26 @@ export function PokemonCard({ name, url, types = [], stats = [], index = 0 }: Po
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-
   return (
-    <article 
-      className="pokemon-card group animate-fade-in-up" 
+    <article
+      className="pokemon-card group animate-fade-in-up"
       ref={ref}
       role="article"
       aria-labelledby={`pokemon-${name}`}
     >
-      <div className="relative">
+      <div className="relative" onMouseEnter={() => {
+        queryClient.prefetchQuery({
+          queryKey: ["pokemon-detail", name],
+          queryFn: ({ signal }) => getPokemonDetail(name, signal),
+          staleTime: POKEMON_CONFIG.CACHE_TIME.POKEMON_DETAIL,
+        });
+      }}>
         {/* Favorite Button */}
         <Button
           variant="ghost"
           size="icon"
-          className={`absolute top-2 right-2 z-10 h-8 w-8 transition-opacity ${
-            fav ? "opacity-100" : "opacity-0 group-hover:opacity-100 focus:opacity-100"
-          }`}
+          className={`absolute top-2 right-2 z-10 h-8 w-8 transition-opacity ${fav ? "opacity-100" : "opacity-0 group-hover:opacity-100 focus:opacity-100"
+            }`}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -72,17 +78,16 @@ export function PokemonCard({ name, url, types = [], stats = [], index = 0 }: Po
           title={fav ? `Remove ${name} from favorites` : `Add ${name} to favorites`}
         >
           <Heart
-            className={`h-4 w-4 ${
-              fav 
-                ? "fill-destructive text-destructive" 
+            className={`h-4 w-4 ${fav
+                ? "fill-destructive text-destructive"
                 : "text-muted-foreground hover:text-destructive"
-            }`}
+              }`}
           />
         </Button>
 
         {/* Pokemon Link */}
-        <Link 
-          href={pokemonUrl} 
+        <Link
+          href={pokemonUrl}
           className="block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
           aria-describedby={`pokemon-${name}-stats`}
         >
@@ -106,9 +111,9 @@ export function PokemonCard({ name, url, types = [], stats = [], index = 0 }: Po
           <div className="space-y-3">
             {/* Name and ID */}
             <div className="text-center">
-              <h3 
+              <h3
                 id={`pokemon-${name}`}
-                className="font-semibold text-base capitalize truncate" 
+                className="font-semibold text-base capitalize truncate"
                 title={pokemon?.name || name}
               >
                 {pokemon?.name || name}
@@ -121,8 +126,8 @@ export function PokemonCard({ name, url, types = [], stats = [], index = 0 }: Po
             {/* Types */}
             <div className="flex flex-wrap gap-1 justify-center">
               {pokemon?.types.map((type) => (
-                <TypeBadge 
-                  key={type.type.name} 
+                <TypeBadge
+                  key={type.type.name}
                   type={type.type.name}
                   className="text-xs px-2 py-1"
                 />
@@ -130,7 +135,7 @@ export function PokemonCard({ name, url, types = [], stats = [], index = 0 }: Po
             </div>
 
             {/* Stats Preview */}
-            <div 
+            <div
               id={`pokemon-${name}-stats`}
               className="grid grid-cols-3 gap-2 text-center text-xs"
             >
