@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getPokemonTypes } from "@/utils/api";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { POKEMON_CONFIG } from "@/lib/constants";
 import { StarIcon } from "lucide-react";
 
 export function Filters() {
@@ -15,7 +16,7 @@ export function Filters() {
 
   // search
   const [search, setSearch] = useState(get("q"));
-  const debounced = useDebouncedValue(search, 500);
+  const debounced = useDebouncedValue(search, POKEMON_CONFIG.DEBOUNCE_DELAY);
   useEffect(() => { setMany({ q: debounced || null }, { replace: true }); }, [debounced, setMany]);
   useEffect(() => { setSearch(get("q")); }, [get]);
 
@@ -24,7 +25,11 @@ export function Filters() {
   const { data: types } = useQuery({
     queryKey: ["types"],
     queryFn: ({ signal }) => getPokemonTypes(signal),
-    staleTime: 1000 * 60 * 60,
+    staleTime: POKEMON_CONFIG.CACHE_TIME.TYPES,
+    retry: (failureCount, error) => {
+      return failureCount < 3 && (error as any)?.status !== 404;
+    },
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // sort
@@ -45,7 +50,7 @@ export function Filters() {
       </div>
 
       <Select value={type || "all"} onValueChange={(v) => setMany({ type: v === "all" ? null : v }, { replace: true })}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-full sm:w-[180px]">
           <SelectValue placeholder="Filter by type" />
         </SelectTrigger>
         <SelectContent>
@@ -60,7 +65,7 @@ export function Filters() {
         const [s, d] = v.split(":");
         setMany({ sort: s, dir: d }, { replace: true });
       }}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-full sm:w-[180px]">
           <SelectValue placeholder="Sort" />
         </SelectTrigger>
         <SelectContent>

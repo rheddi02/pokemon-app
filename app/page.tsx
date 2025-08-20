@@ -15,8 +15,9 @@ import { idFromUrl } from "@/utils/poke-assets";
 import { useMemo, Suspense } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useFavorites } from "@/components/providers/favorites-provider";
+import { POKEMON_CONFIG } from "@/lib/constants";
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = POKEMON_CONFIG.PAGE_SIZE;
 
 function HomePageContent() {
   const { get } = useQueryParams();
@@ -33,8 +34,12 @@ function HomePageContent() {
   const listQ = useQuery({
     queryKey: ["pokemon-list"],
     queryFn: ({ signal }) =>
-      getPokemonList({ limit: 1000, offset: 0 }, signal), // Get more items for filtering
-    staleTime: 1000 * 60 * 5, // 5 min cache
+      getPokemonList({ limit: POKEMON_CONFIG.MAX_POKEMON_FETCH, offset: 0 }, signal),
+    staleTime: POKEMON_CONFIG.CACHE_TIME.POKEMON_LIST,
+    retry: (failureCount, error) => {
+      return failureCount < 3 && (error as any)?.status !== 404;
+    },
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Optional type restriction
@@ -42,7 +47,11 @@ function HomePageContent() {
     queryKey: ["type", type],
     queryFn: ({ signal }) => getPokemonByType(type, signal),
     enabled: Boolean(type),
-    staleTime: 1000 * 60 * 30,
+    staleTime: POKEMON_CONFIG.CACHE_TIME.TYPES,
+    retry: (failureCount, error) => {
+      return failureCount < 3 && (error as any)?.status !== 404;
+    },
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const loading = listQ.isLoading || (type && typeQ.isLoading);
@@ -110,9 +119,9 @@ function HomePageContent() {
               role="list"
               aria-label="Pokémon results"
             >
-              {items.map((r) => (
+              {items.map((r, index) => (
                 <div key={r.name} role="listitem">
-                  <PokemonCard name={r.name} url={r.url} />
+                  <PokemonCard name={r.name} url={r.url} index={index} />
                 </div>
               ))}
             </div>

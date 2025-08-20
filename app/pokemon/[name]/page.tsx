@@ -136,11 +136,11 @@ export default function PokemonDetailPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Height</p>
-                    <p className="text-lg font-semibold">{(d.height / 10).toFixed(1)} m</p>
+                    <p className="text-base font-semibold">{(d.height / 10).toFixed(1)} m</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Weight</p>
-                    <p className="text-lg font-semibold">{(d.weight / 10).toFixed(1)} kg</p>
+                    <p className="text-base font-semibold">{(d.weight / 10).toFixed(1)} kg</p>
                   </div>
                 </div>
               </CardContent>

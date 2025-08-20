@@ -7,8 +7,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-
-const FAVORITES_KEY = "pokemon-favorites";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface FavoritesContextType {
   favorites: string[];
@@ -25,7 +24,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
   // Load favorites from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem(FAVORITES_KEY);
+    const stored = localStorage.getItem(STORAGE_KEYS.FAVORITES);
 
     if (stored) {
       try {
@@ -38,17 +37,15 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-  }, [favorites]);
-
   const toggleFavorite = useCallback((pokemonName: string) => {
     setFavorites((prev) => {
-      if (prev.includes(pokemonName)) {
-        return prev.filter((name) => name !== pokemonName);
-      } else {
-        return [...prev, pokemonName];
-      }
+      const newFavorites = prev.includes(pokemonName)
+        ? prev.filter((name) => name !== pokemonName)
+        : [...prev, pokemonName];
+      
+      // Save to localStorage immediately in the state update
+      localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(newFavorites));
+      return newFavorites;
     });
   }, []);
 
