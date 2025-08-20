@@ -12,13 +12,13 @@ import { useQuery } from "@tanstack/react-query";
 import { getPokemonList, getPokemonByType } from "@/utils/api";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { idFromUrl } from "@/utils/poke-assets";
-import { useMemo } from "react";
+import { useMemo, Suspense } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useFavorites } from "@/components/providers/favorites-provider";
 
 const PAGE_SIZE = 24;
 
-export default function HomePage() {
+function HomePageContent() {
   const { get } = useQueryParams();
   const q = (get("q") || "").toLowerCase().trim();
   const type = get("type") || "";
@@ -121,5 +121,13 @@ export default function HomePage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<PokemonListSkeleton />}>
+      <HomePageContent />
+    </Suspense>
   );
 }
