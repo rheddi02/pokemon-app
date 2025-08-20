@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
 import { idFromUrl, artUrl, spriteUrl } from "@/utils/poke-assets";
 import { useFavorites } from "@/components/providers/favorites-provider";
 import { Button } from "@/components/ui/button";
@@ -12,17 +11,14 @@ import { getPokemonDetail } from "@/utils/api";
 import { POKEMON_CONFIG } from "@/lib/constants";
 import { useInView } from "react-intersection-observer";
 import { useSearchParams } from "next/navigation";
-import { PokemonCardSkeleton } from "./pokemon-card-skeleton";
 
 interface PokemonCardProps {
   name: string;
   url: string;
-  types?: Array<{ type: { name: string } }>;
-  stats?: Array<{ stat: { name: string }; base_stat: number }>;
   index?: number;
 }
 
-export function PokemonCard({ name, url, types = [], stats = [], index = 0 }: PokemonCardProps) {
+export function PokemonCard({ name, url, index = 0 }: PokemonCardProps) {
   const id = idFromUrl(url);
   const img = id ? artUrl(id) : spriteUrl(1); // Fallback to sprite of Pokemon #1
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -103,7 +99,7 @@ export function PokemonCard({ name, url, types = [], stats = [], index = 0 }: Po
               width={200}
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
               placeholder="blur"
-              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmM2Y0ZjYiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlNWU3ZWIiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2cpIi8+PC9zdmc+"
+              blurDataURL="/pokeball.png"
             />
           </div>
 
