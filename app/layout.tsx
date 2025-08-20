@@ -16,8 +16,35 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pokémon App",
-  description: "Browse and search Pokémon",
+  title: "Pokemon Explorer - Discover & Explore All Pokemon",
+  description: "Explore the complete Pokemon database with detailed stats, types, and abilities. Search, filter, and save your favorite Pokemon in this comprehensive Pokemon explorer app.",
+  keywords: ["pokemon", "pokedex", "pokemon database", "pokemon stats", "pokemon types", "pokemon explorer", "pokemon search"],
+  authors: [{ name: "Pokemon Explorer" }],
+  creator: "Pokemon Explorer",
+  publisher: "Pokemon Explorer",
+  openGraph: {
+    title: "Pokemon Explorer - Discover & Explore All Pokemon",
+    description: "Explore the complete Pokemon database with detailed stats, types, and abilities. Search, filter, and save your favorite Pokemon.",
+    type: "website",
+    locale: "en_US",
+    siteName: "Pokemon Explorer",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pokemon Explorer - Discover & Explore All Pokemon",
+    description: "Explore the complete Pokemon database with detailed stats, types, and abilities. Search, filter, and save your favorite Pokemon.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 export default function RootLayout({
   children,
