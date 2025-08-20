@@ -31,12 +31,10 @@ export function TypeBadge({ type, className }: TypeBadgeProps) {
   
   return (
     <Badge
-      className={`type-badge capitalize ${className}`}
+      className={`type-badge type-badge-${type} capitalize text-white ${className}`}
       style={{ 
-        backgroundColor: color,
-        borderColor: color,
-        color: 'white'
-      }}
+        '--type-color': color,
+      } as React.CSSProperties}
     >
       {type}
     </Badge>

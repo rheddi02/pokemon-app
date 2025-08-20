@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@import "@tailwind base";
+@tailwind components;
+@tailwind utilities;
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -164,6 +168,12 @@
   }
 
   .type-badge {
-    @apply px-3 py-1 rounded-full text-sm font-medium text-white;
+    @apply px-3 py-1 rounded-full text-sm font-medium text-white transition-all duration-200;
+    background-color: var(--type-color);
+    border-color: var(--type-color);
+  }
+  
+  .type-badge:hover {
+    filter: brightness(0.85);
   }
 }
