@@ -1,20 +1,18 @@
 "use client";
 
-import { Header } from "@/components/layout/header";
-import { Filters } from "@/components/pokemon/filters";
-import { PokemonListSkeleton } from "@/components/pokemon/pokemon-list-skeleton";
-import { PokemonCard } from "@/components/pokemon/pokemon-card";
-import { EmptyState } from "@/components/pokemon/empty-state";
-import { ErrorState } from "@/components/pokemon/error-state";
-import { Pagination } from "@/components/pokemon/pagination";
-
+import { Suspense, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getPokemonList, getPokemonByType } from "@/utils/api";
+import { PokemonCard } from "@/components/pokemon/pokemon-card";
+import { Filters } from "@/components/pokemon/filters";
+import { PokemonListSkeleton } from "@/components/pokemon/pokemon-list-skeleton";
+import { ErrorState } from "@/components/pokemon/error-state";
+import { EmptyState } from "@/components/pokemon/empty-state";
+import { Pagination } from "@/components/pokemon/pagination";
+import { Header } from "@/components/layout/header";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { idFromUrl } from "@/utils/poke-assets";
-import { useMemo, Suspense } from "react";
-import { keepPreviousData } from "@tanstack/react-query";
 import { useFavorites } from "@/components/providers/favorites-provider";
+import { idFromUrl } from "@/utils/poke-assets";
 import { POKEMON_CONFIG } from "@/lib/constants";
 
 const PAGE_SIZE = POKEMON_CONFIG.PAGE_SIZE;

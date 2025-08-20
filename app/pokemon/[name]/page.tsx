@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getPokemonDetail } from "@/utils/api";
 import { PokemonCardSkeleton } from "@/components/pokemon/pokemon-card-skeleton";
@@ -16,6 +16,10 @@ import Link from "next/link";
 export default function PokemonDetailPage() {
   const { name } = useParams<{ name: string }>();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const searchParams = useSearchParams();
+  
+  // Construct back URL with preserved parameters
+  const backUrl = searchParams.toString() ? `/?${searchParams.toString()}` : '/';
 
   const detail = useQuery({
     queryKey: ["pokemon-detail", name],
@@ -51,7 +55,7 @@ export default function PokemonDetailPage() {
     <div className="min-h-screen bg-background py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="flex items-center justify-between mb-8">
-          <Link href="/">
+          <Link href={backUrl}>
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Explorer

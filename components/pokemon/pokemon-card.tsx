@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getPokemonDetail } from "@/utils/api";
 import { POKEMON_CONFIG } from "@/lib/constants";
 import { useInView } from "react-intersection-observer";
+import { useSearchParams } from "next/navigation";
 
 interface PokemonCardProps {
   name: string;
@@ -25,6 +26,10 @@ export function PokemonCard({ name, url, types = [], stats = [], index = 0 }: Po
   const img = id ? artUrl(id) : spriteUrl(1); // Fallback to sprite of Pokemon #1
   const { isFavorite, toggleFavorite } = useFavorites();
   const fav = isFavorite(name);
+  const searchParams = useSearchParams();
+  
+  // Preserve current URL params when navigating to Pokemon detail
+  const pokemonUrl = `/pokemon/${name}?${searchParams.toString()}`;
 
   const { ref, inView } = useInView({
     triggerOnce: true, // load only once
@@ -41,6 +46,7 @@ export function PokemonCard({ name, url, types = [], stats = [], index = 0 }: Po
     },
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
+
 
   return (
     <article 
@@ -76,7 +82,7 @@ export function PokemonCard({ name, url, types = [], stats = [], index = 0 }: Po
 
         {/* Pokemon Link */}
         <Link 
-          href={`/pokemon/${name}`} 
+          href={pokemonUrl} 
           className="block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
           aria-describedby={`pokemon-${name}-stats`}
         >
