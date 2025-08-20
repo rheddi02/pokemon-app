@@ -5,8 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { getPokemonDetail } from "@/utils/api";
 import { PokemonCardSkeleton } from "@/components/pokemon/pokemon-card-skeleton";
 import { ErrorState } from "@/components/pokemon/error-state";
-import { useFavorites } from "@/hooks/use-favorites";
+import { useFavorites } from "@/components/providers/favorites-provider";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TypeBadge } from "@/components/pokemon/type-badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft, Heart } from "lucide-react";
+import Link from "next/link";
 
 export default function PokemonDetailPage() {
   const { name } = useParams<{ name: string }>();
@@ -43,50 +48,127 @@ export default function PokemonDetailPage() {
   const fav = isFavorite(d.name);
 
   return (
-    <main className="container mx-auto px-4 py-6">
-      <article className="rounded-xl border p-4 shadow-sm">
-        <header className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-semibold capitalize">
-            {d.name} <span className="text-sm text-muted-foreground">#{d.id}</span>
-          </h1>
-          <Button variant={fav ? "default" : "outline"} onClick={() => toggleFavorite(d.name)}>
-            {fav ? "★ Favorite" : "☆ Favorite"}
-          </Button>
-        </header>
-        <div className="flex flex-col gap-6 md:flex-row md:items-start">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          {img ? <img src={img} alt={d.name} className="h-40 w-40 object-contain" /> : null}
+    <div className="min-h-screen bg-background py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <div className="flex items-center justify-between mb-8">
+          <Link href="/">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Explorer
+            </Button>
+          </Link>
 
-          <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-1">
-            <div>
-              <h2 className="font-medium mb-2">Types</h2>
-              <ul className="list-disc list-inside">
-                {d.types.map((t) => (
-                  <li key={t.type.name} className="capitalize">{t.type.name}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h2 className="font-medium mb-2">Stats</h2>
-              <ul className="list-disc list-inside">
-                {d.stats.map((s) => (
-                  <li key={s.stat.name} className="capitalize">{s.stat.name}: {s.base_stat}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h2 className="font-medium mb-2">Abilities</h2>
-              <ul className="list-disc list-inside">
-                {d.abilities.map((a) => (
-                  <li key={a.ability.name} className="capitalize">
-                    {a.ability.name}{a.is_hidden ? " (hidden)" : ""}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
+          <Button
+            variant={fav ? "default" : "outline"}
+            onClick={() => toggleFavorite(name)}
+            className={fav ? "bg-destructive hover:bg-destructive/90" : ""}
+          >
+            <Heart className={`h-4 w-4 mr-2 ${fav ? "fill-current" : ""}`} />
+            {fav ? "Remove from Favorites" : "Add to Favorites"}
+          </Button>
         </div>
-      </article>
-    </main>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Pokemon Image */}
+          <Card className="pokemon-card">
+            <CardContent className="p-8 text-center">
+              <img
+                src={img}
+                alt={d.name}
+                className="w-full max-w-sm mx-auto mb-4 animate-pokemon-bounce"
+              />
+              <h1 className="text-4xl font-bold capitalize mb-2">{d.name}</h1>
+              <p className="text-muted-foreground">#{d.id.toString().padStart(3, '0')}</p>
+            </CardContent>
+          </Card>
+
+          {/* Pokemon Details */}
+          <div className="space-y-6">
+            {/* Types */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Type</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {d.types.map((type) => (
+                    <TypeBadge key={type.type.name} type={type.type.name} />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Base Stats</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {d.stats.map((stat) => (
+                    <div key={stat.stat.name} className="flex items-center justify-between">
+                      <span className="capitalize text-sm font-medium">
+                        {stat.stat.name.replace('-', ' ')}
+                      </span>
+                      <div className="flex items-center gap-3 flex-1 ml-4">
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div
+                            className="bg-yellow-500 h-2 rounded-full transition-all duration-500"
+                            style={{ width: `${Math.min((stat.base_stat / 255) * 100, 100)}%` }}
+                          />
+                        </div>
+                        <span className="text-sm font-bold min-w-[3rem] text-right">
+                          {stat.base_stat}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Physical Details */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Physical Details</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Height</p>
+                    <p className="text-lg font-semibold">{(d.height / 10).toFixed(1)} m</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Weight</p>
+                    <p className="text-lg font-semibold">{(d.weight / 10).toFixed(1)} kg</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Abilities */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Abilities</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {d.abilities.map((ability) => (
+                    <Badge
+                      key={ability.ability.name}
+                      variant={ability.is_hidden ? "secondary" : "outline"}
+                      className="capitalize"
+                    >
+                      {ability.ability.name.replace('-', ' ')}
+                      {ability.is_hidden && " (Hidden)"}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -11,10 +11,10 @@ import { Pagination } from "@/components/pokemon/pagination";
 import { useQuery } from "@tanstack/react-query";
 import { getPokemonList, getPokemonByType } from "@/utils/api";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { useFavorites } from "@/hooks/use-favorites";
 import { idFromUrl } from "@/utils/poke-assets";
 import { useMemo } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
+import { useFavorites } from "@/components/providers/favorites-provider";
 
 const PAGE_SIZE = 24;
 
